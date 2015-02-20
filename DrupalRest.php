@@ -175,7 +175,7 @@ class DrupalRest {
       return $result;
     }
 		
-		// Retrieve a file based on fid
+    // Retrieve a file based on fid
     public function retrieveFile($fid) {
     		$result = new stdClass;
         $result->ErrorCode = NULL;
@@ -195,8 +195,9 @@ class DrupalRest {
 
         return $result;
     }
-
-		public function createFile($file) {
+    
+    // Create a file - see the examples for more info
+    public function createFile($file) {
         $post = http_build_query($file, '', '&');
         $ch = curl_init($this->hostendpoint . 'file');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
