@@ -88,9 +88,9 @@ class DrupalRest {
 
     // Retrieve a node from a node id
     public function retrieveNode($nid) {
+    		$result = new stdClass;
         $result->ErrorCode = NULL;
-        $decodedBody= json_decode($body);
-        $result = (object) array_merge((array) $result, (array) $decodedBody );        
+				
         $nid = (int) $nid;
         $ch = curl_init($this->hostendpoint . 'node/' . $nid );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -138,7 +138,7 @@ class DrupalRest {
 
         return $result;
     }
-    
+
     /*
      * @param $node
      *  An array of the node that you want to create
@@ -173,6 +173,48 @@ class DrupalRest {
       curl_close($ch);
 
       return $result;
+    }
+		
+		// Retrieve a file based on fid
+    public function retrieveFile($fid) {
+    		$result = new stdClass;
+        $result->ErrorCode = NULL;
+
+        $fid = (int) $fid;
+        $ch = curl_init($this->hostendpoint . 'file/' . $fid );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,array (
+          "Accept: application/json",
+          "Cookie: $this->session"
+        ));
+
+        $result = $this->_handleResponse($ch);
+        curl_close($ch);
+
+        return $result;
+    }
+
+		public function createFile($file) {
+        $post = http_build_query($file, '', '&');
+        $ch = curl_init($this->hostendpoint . 'file');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,
+        array (
+          "Accept: application/json",
+          "Content-type: application/x-www-form-urlencoded",
+          "Cookie: $this->session",
+          'X-CSRF-Token: ' . $this->csrf_token,
+        ));
+
+        $result = $this->_handleResponse($ch);
+        curl_close($ch);
+
+        return $result;
     }
 
     /*
