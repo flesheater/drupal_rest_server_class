@@ -22,14 +22,15 @@
 /**
  *
  */
-class DrupalRest {
-  private $username;
-  private $password;
-  private $session;
-  private $host;
-  private $hostendpoint;
-  private $debug;
-  private $csrf_token;
+class DrupalRest
+{
+    private $username;
+    private $password;
+    private $session;
+    private $host;
+    private $hostendpoint;
+    private $debug;
+    private $csrf_token;
 
   /**
    *
@@ -44,33 +45,35 @@ class DrupalRest {
    * @param $debug
    *   A bool value if you want it to be in debug mode
    */
-  function __construct($host, $endpoint, $username, $password, $debug) {
-    $this->username = $username;
-    $this->password = $password;
-    $this->hostendpoint = $this->_trailSlashFilter($host) . '/' . $this->_trailSlashFilter($endpoint) . '/';
-    $this->host = $this->_trailSlashFilter($host) . '/';
-    $this->debug = $debug;
+  public function __construct($host, $endpoint, $username, $password, $debug)
+  {
+      $this->username = $username;
+      $this->password = $password;
+      $this->hostendpoint = $this->_trailSlashFilter($host) . '/' . $this->_trailSlashFilter($endpoint) . '/';
+      $this->host = $this->_trailSlashFilter($host) . '/';
+      $this->debug = $debug;
   }
 
   /**
    * Logging in to the remote drupal system.
    */
-  public function login() {
-    $ch = curl_init($this->hostendpoint . 'user/login.json');
-    $post_data = array(
+  public function login()
+  {
+      $ch = curl_init($this->hostendpoint . 'user/login.json');
+      $post_data = array(
       'username' => $this->username,
       'password' => $this->password,
     );
-    $post = http_build_query($post_data, '', '&');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      $post = http_build_query($post_data, '', '&');
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HEADER, false);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
       "Accept: application/json",
       "Content-type: application/x-www-form-urlencoded",
     ));
-    $response = json_decode(curl_exec($ch));
+      $response = json_decode(curl_exec($ch));
 
     // Save Session information to be sent as cookie with future calls.
     $this->session = $response->session_name . '=' . $response->sessid;
@@ -80,37 +83,38 @@ class DrupalRest {
       CURLOPT_RETURNTRANSFER => 1,
       CURLOPT_URL => $this->host . 'services/session/token',
     ));
-    curl_setopt($ch, CURLOPT_COOKIE, "$this->session");
+      curl_setopt($ch, CURLOPT_COOKIE, "$this->session");
 
-    $ret = new stdClass();
-    $ret->response = curl_exec($ch);
-    $ret->error    = curl_error($ch);
-    $ret->info     = curl_getinfo($ch);
+      $ret = new stdClass();
+      $ret->response = curl_exec($ch);
+      $ret->error    = curl_error($ch);
+      $ret->info     = curl_getinfo($ch);
 
-    $this->csrf_token = $ret->response;
+      $this->csrf_token = $ret->response;
   }
 
   /**
    * Retrieve a node from a node id.
    */
-  public function retrieveNode($nid) {
-    $result = new stdClass();
-    $result->ErrorCode = NULL;
+  public function retrieveNode($nid)
+  {
+      $result = new stdClass();
+      $result->ErrorCode = null;
 
-    $nid = (int) $nid;
-    $ch = curl_init($this->hostendpoint . 'node/' . $nid);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, TRUE);
-    curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      $nid = (int) $nid;
+      $ch = curl_init($this->hostendpoint . 'node/' . $nid);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
       "Accept: application/json",
       "Cookie: $this->session",
     ));
 
-    $result = $this->_handleResponse($ch);
-    curl_close($ch);
+      $result = $this->_handleResponse($ch);
+      curl_close($ch);
 
-    return $result;
+      return $result;
   }
 
   /**
@@ -125,14 +129,15 @@ class DrupalRest {
    *   You can specify the other fields you want to change the same way.
    *   E.g. $node['body']['und'][0]['value']
    */
-  public function createNode($node) {
-    $post = http_build_query($node, '', '&');
-    $ch = curl_init($this->hostendpoint . 'node');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, TRUE);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-    curl_setopt($ch, CURLOPT_HTTPHEADER,
+  public function createNode($node)
+  {
+      $post = http_build_query($node, '', '&');
+      $ch = curl_init($this->hostendpoint . 'node');
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+      curl_setopt($ch, CURLOPT_HTTPHEADER,
       array(
         "Accept: application/json",
         "Content-type: application/x-www-form-urlencoded",
@@ -140,10 +145,10 @@ class DrupalRest {
         'X-CSRF-Token: ' . $this->csrf_token,
       ));
 
-    $result = $this->_handleResponse($ch);
-    curl_close($ch);
+      $result = $this->_handleResponse($ch);
+      curl_close($ch);
 
-    return $result;
+      return $result;
   }
 
   /**
@@ -156,20 +161,21 @@ class DrupalRest {
    *   You can specify the other fields you want to change the same way.
    *   E.g. $node['title'] or $node['body']['und'][0]['value']
    */
-  public function updateNode($node) {
-    $post = http_build_query($node, '', '&');
-    $ch = curl_init($this->hostendpoint . 'node/' . $node['nid']);
+  public function updateNode($node)
+  {
+      $post = http_build_query($node, '', '&');
+      $ch = curl_init($this->hostendpoint . 'node/' . $node['nid']);
 
     // Emulate file.
     $putData = fopen('php://temp', 'rw+');
-    fwrite($putData, $post);
-    fseek($putData, 0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, TRUE);
-    curl_setopt($ch, CURLOPT_PUT, TRUE);
-    curl_setopt($ch, CURLOPT_INFILE, $putData);
-    curl_setopt($ch, CURLOPT_INFILESIZE, mb_strlen($post));
-    curl_setopt($ch, CURLOPT_HTTPHEADER,
+      fwrite($putData, $post);
+      fseek($putData, 0);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLOPT_PUT, true);
+      curl_setopt($ch, CURLOPT_INFILE, $putData);
+      curl_setopt($ch, CURLOPT_INFILESIZE, mb_strlen($post));
+      curl_setopt($ch, CURLOPT_HTTPHEADER,
     array(
       "Accept: application/json",
       "Content-type: application/x-www-form-urlencoded",
@@ -177,46 +183,48 @@ class DrupalRest {
       'X-CSRF-Token: ' . $this->csrf_token,
     ));
 
-    $result = $this->_handleResponse($ch);
-    curl_close($ch);
+      $result = $this->_handleResponse($ch);
+      curl_close($ch);
 
-    return $result;
+      return $result;
   }
 
   /**
    * Retrieve a file based on fid.
    */
-  public function retrieveFile($fid) {
-    $result = new stdClass();
-    $result->ErrorCode = NULL;
+  public function retrieveFile($fid)
+  {
+      $result = new stdClass();
+      $result->ErrorCode = null;
 
-    $fid = (int) $fid;
-    $ch = curl_init($this->hostendpoint . 'file/' . $fid);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, TRUE);
-    curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      $fid = (int) $fid;
+      $ch = curl_init($this->hostendpoint . 'file/' . $fid);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
       "Accept: application/json",
       "Cookie: $this->session",
     ));
 
-    $result = $this->_handleResponse($ch);
-    curl_close($ch);
+      $result = $this->_handleResponse($ch);
+      curl_close($ch);
 
-    return $result;
+      return $result;
   }
 
   /**
    * Create a file - see the examples for more info.
    */
-  public function createFile($file) {
-    $post = http_build_query($file, '', '&');
-    $ch = curl_init($this->hostendpoint . 'file');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, TRUE);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-    curl_setopt($ch, CURLOPT_HTTPHEADER,
+  public function createFile($file)
+  {
+      $post = http_build_query($file, '', '&');
+      $ch = curl_init($this->hostendpoint . 'file');
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+      curl_setopt($ch, CURLOPT_HTTPHEADER,
       array(
         "Accept: application/json",
         "Content-type: application/x-www-form-urlencoded",
@@ -224,10 +232,10 @@ class DrupalRest {
         'X-CSRF-Token: ' . $this->csrf_token,
       ));
 
-    $result = $this->_handleResponse($ch);
-    curl_close($ch);
+      $result = $this->_handleResponse($ch);
+      curl_close($ch);
 
-    return $result;
+      return $result;
   }
 
   /**
@@ -238,16 +246,17 @@ class DrupalRest {
    *   A helper function for removing the trailing slash from the $host variable
    *   at the end or from the $endpoint variable from the beginning
    */
-  private function _trailSlashFilter($string) {
-    if (substr($string, -1) == '/') {
-      $string = substr($string, 0, -1);
-    }
+  private function _trailSlashFilter($string)
+  {
+      if (substr($string, -1) == '/') {
+          $string = substr($string, 0, -1);
+      }
 
-    if (substr($string, 0, 1) == '/') {
-      $string = substr($string, 1);
-    }
+      if (substr($string, 0, 1) == '/') {
+          $string = substr($string, 1);
+      }
 
-    return $string;
+      return $string;
   }
 
   /**
@@ -255,33 +264,32 @@ class DrupalRest {
    * @param $ch
    *   The cURL handle
    */
-  private function _handleResponse($ch) {
-    $response = curl_exec($ch);
-    $info = curl_getinfo($ch);
+  private function _handleResponse($ch)
+  {
+      $response = curl_exec($ch);
+      $info = curl_getinfo($ch);
 
     // Break apart header & body.
     $header = substr($response, 0, $info['header_size']);
-    $body = substr($response, $info['header_size']);
+      $body = substr($response, $info['header_size']);
 
-    $result = new stdClass();
+      $result = new stdClass();
 
-    if ($info['http_code'] != '200') {
-      $header_arrray = explode("\n", $header);
-      $result->ErrorCode = $info['http_code'];
-      $result->ErrorText = $header_arrray['0'];
-    }
-    else {
-      $result->ErrorCode = NULL;
-      $decodedBody = json_decode($body);
-      $result = (object) array_merge((array) $result, (array) $decodedBody);
-    }
+      if ($info['http_code'] != '200') {
+          $header_arrray = explode("\n", $header);
+          $result->ErrorCode = $info['http_code'];
+          $result->ErrorText = $header_arrray['0'];
+      } else {
+          $result->ErrorCode = null;
+          $decodedBody = json_decode($body);
+          $result = (object) array_merge((array) $result, (array) $decodedBody);
+      }
 
-    if ($this->debug) {
-      $result->header = $header;
-      $result->body = $body;
-    }
+      if ($this->debug) {
+          $result->header = $header;
+          $result->body = $body;
+      }
 
-    return $result;
+      return $result;
   }
-
 }
