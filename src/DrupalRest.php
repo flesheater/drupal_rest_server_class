@@ -1,26 +1,9 @@
 <?php
-/**
- * @file
- * Content of the DrupalRest class.
- *
- * This is my version of the class DrupalREST, that could be found here
- * https://github.com/RandallKent/DrupalREST.PHP/blob/master/DrupalREST.php.
- *
- * Things that are fixed:
- * - better encapsulation
- * - added the $host param to the construct method so that it is not hardcoded
- * - made the $endpoint variable only the endpoint part of the service, without the host
- * - trailing slash fix
- * - added a method for updating the node
- * - added more comments in the code
- * - added examples of using it in the examples.php
- *
- * The last version of this class could be found here:
- * http://github.com/flesheater/drupal_rest_server_class
- */
+
+namespace Webham\DrupalTools;
 
 /**
- *
+ * A component that communicates with a Drupal 7 website.
  */
 class DrupalRest
 {
