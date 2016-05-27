@@ -73,7 +73,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [link-packagist]: https://packagist.org/packages/:vendor/:package_name
 [link-travis]: https://travis-ci.org/:vendor/:package_name
-[link-scrutinizer]: https://scrutinizer-ci.com/g/flesheater/drupal_rest_server_class/code-structure
+[link-scrutinizer]: https://scrutinizer-ci.com/g/flesheater/drupal_rest_server_class/badges/coverage.png?b=master
 [link-code-quality]: https://scrutinizer-ci.com/g/flesheater/drupal_rest_server_class
 [link-downloads]: https://packagist.org/packages/:vendor/:package_name
 [link-author]: https://github.com/flesheater
