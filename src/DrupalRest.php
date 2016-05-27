@@ -44,28 +44,28 @@ class DrupalRest
   {
       $ch = curl_init($this->hostendpoint . 'user/login.json');
       $post_data = array(
-      'username' => $this->username,
-      'password' => $this->password,
-    );
+        'username' => $this->username,
+        'password' => $this->password,
+      );
       $post = http_build_query($post_data, '', '&');
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_HEADER, false);
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-      "Accept: application/json",
-      "Content-type: application/x-www-form-urlencoded",
-    ));
+        "Accept: application/json",
+        "Content-type: application/x-www-form-urlencoded",
+      ));
       $response = json_decode(curl_exec($ch));
 
-    // Save Session information to be sent as cookie with future calls.
-    $this->session = $response->session_name . '=' . $response->sessid;
+      // Save Session information to be sent as cookie with future calls.
+      $this->session = $response->session_name . '=' . $response->sessid;
 
-    // GET CSRF Token.
-    curl_setopt_array($ch, array(
-      CURLOPT_RETURNTRANSFER => 1,
-      CURLOPT_URL => $this->host . 'services/session/token',
-    ));
+      // GET CSRF Token.
+      curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => 1,
+       CURLOPT_URL => $this->host . 'services/session/token',
+      ));
       curl_setopt($ch, CURLOPT_COOKIE, "$this->session");
 
       $ret = new stdClass();
@@ -90,9 +90,9 @@ class DrupalRest
       curl_setopt($ch, CURLOPT_HEADER, true);
       curl_setopt($ch, CURLINFO_HEADER_OUT, true);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-      "Accept: application/json",
-      "Cookie: $this->session",
-    ));
+        "Accept: application/json",
+        "Cookie: $this->session",
+      ));
 
       $result = $this->_handleResponse($ch);
       curl_close($ch);
@@ -149,8 +149,8 @@ class DrupalRest
       $post = http_build_query($node, '', '&');
       $ch = curl_init($this->hostendpoint . 'node/' . $node['nid']);
 
-    // Emulate file.
-    $putData = fopen('php://temp', 'rw+');
+      // Emulate file.
+      $putData = fopen('php://temp', 'rw+');
       fwrite($putData, $post);
       fseek($putData, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -158,13 +158,12 @@ class DrupalRest
       curl_setopt($ch, CURLOPT_PUT, true);
       curl_setopt($ch, CURLOPT_INFILE, $putData);
       curl_setopt($ch, CURLOPT_INFILESIZE, mb_strlen($post));
-      curl_setopt($ch, CURLOPT_HTTPHEADER,
-    array(
-      "Accept: application/json",
-      "Content-type: application/x-www-form-urlencoded",
-      "Cookie: $this->session",
-      'X-CSRF-Token: ' . $this->csrf_token,
-    ));
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Accept: application/json",
+        "Content-type: application/x-www-form-urlencoded",
+        "Cookie: $this->session",
+        'X-CSRF-Token: ' . $this->csrf_token,
+      ));
 
       $result = $this->_handleResponse($ch);
       curl_close($ch);
@@ -186,9 +185,9 @@ class DrupalRest
       curl_setopt($ch, CURLOPT_HEADER, true);
       curl_setopt($ch, CURLINFO_HEADER_OUT, true);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-      "Accept: application/json",
-      "Cookie: $this->session",
-    ));
+        "Accept: application/json",
+        "Cookie: $this->session",
+      ));
 
       $result = $this->_handleResponse($ch);
       curl_close($ch);
@@ -207,8 +206,7 @@ class DrupalRest
       curl_setopt($ch, CURLOPT_HEADER, true);
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-      curl_setopt($ch, CURLOPT_HTTPHEADER,
-      array(
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         "Accept: application/json",
         "Content-type: application/x-www-form-urlencoded",
         "Cookie: $this->session",
@@ -252,8 +250,8 @@ class DrupalRest
       $response = curl_exec($ch);
       $info = curl_getinfo($ch);
 
-    // Break apart header & body.
-    $header = substr($response, 0, $info['header_size']);
+      // Break apart header & body.
+      $header = substr($response, 0, $info['header_size']);
       $body = substr($response, $info['header_size']);
 
       $result = new stdClass();
